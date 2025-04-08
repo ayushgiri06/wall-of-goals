@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wall of Goals - Share Your Dreams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e, #0f0c29);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            animation: titleGlow 3s ease-in-out infinite;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .goals-wall {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .goal-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+                        inset 0 0 15px rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .goal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.2),
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            filter: blur(4px);
+        }
+
+        .goal-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .goal-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        @keyframes pulseButton {
+            0% { transform: scale(1); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 8px 15px rgba(0, 198, 255, 0.3); }
+            100% { transform: scale(1); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
+        }
+
+        .add-goal {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            animation: pulseButton 2s ease-in-out infinite;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .add-goal:hover {
+            transform: scale(1.05);
+        }
+
+        .goal-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(23, 23, 43, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            color: white;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .goal-form.active {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #00c6ff;
+            box-shadow: 0 0 20px rgba(0, 198, 255, 0.2);
+            outline: none;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .form-buttons button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-goal {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .submit-goal:hover {
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
+            transform: translateY(-2px);
+        }
+
+        .cancel-goal {
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cancel-goal:hover {
+            background: #ccc;
+        }
+
+        .goal-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .like-btn,
+        .comment-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .like-btn:hover,
+        .comment-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .comments-section {
+            margin-top: 1rem;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .comment-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .comment-input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        .comment {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Wall of Goals</h1>
+            <p class="subtitle">Share your dreams, inspire others, achieve greatness</p>
+        </header>
+
+        <div class="goals-wall" id="goalsWall">
+            <!-- Sample Goals -->
+            <div class="goal-card">
+                <h3>Run a Marathon</h3>
+                <p>Training hard to complete my first marathon by December 2025!</p>
+                <p><small>Posted by: Sarah</small></p>
+            </div>
+            <div class="goal-card">
+                <h3>Learn Japanese</h3>
+                <p>Aiming to reach N3 proficiency level within the next year.</p>
+                <p><small>Posted by: Mike</small></p>
+            </div>
+            <div class="goal-card">
+                <h3>Start a Business</h3>
+                <p>Working on launching my eco-friendly product line by summer 2025.</p>
+                <p><small>Posted by: Emma</small></p>
+            </div>
+        </div>
+    </div>
+
+    <button class="add-goal" onclick="showGoalForm()">+ Add Your Goal</button>
+
+    <div class="goal-form" id="goalForm">
+        <h2>Share Your Goal</h2>
+        <form onsubmit="addGoal(event)">
+            <div class="form-group">
+                <label for="goalTitle">Goal Title</label>
+                <input type="text" id="goalTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="goalDescription">Description</label>
+                <textarea id="goalDescription" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="cancel-goal" onclick="hideGoalForm()">Cancel</button>
+                <button type="submit" class="submit-goal">Share Goal</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Add animation delay to existing goals
+        document.querySelectorAll('.goal-card').forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.2}s`;
+        });
+        function showGoalForm() {
+            document.getElementById('goalForm').classList.add('active');
+        }
+
+        function hideGoalForm() {
+            document.getElementById('goalForm').classList.remove('active');
+        }
+
+        function addGoal(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('goalTitle').value;
+            const description = document.getElementById('goalDescription').value;
+            const name = document.getElementById('name').value;
+
+            const goalCard = document.createElement('div');
+            goalCard.className = 'goal-card';
+            goalCard.innerHTML = `
+                <h3>${title}</h3>
+                <p>${description}</p>
+                <p><small>Posted by: ${name}</small></p>
+                <div class="goal-actions">
+                    <button onclick="likeGoal(this)" class="like-btn">
+                        ❤️ <span>0</span>
+                    </button>
+                    <button onclick="addComment(this)" class="comment-btn">
+                        💭 Comment
+                    </button>
+                </div>
+                <div class="comments-section" style="display: none;">
+                    <input type="text" placeholder="Add a comment..." class="comment-input">
+                </div>
+            `;
+
+            document.getElementById('goalsWall').prepend(goalCard);
+            hideGoalForm();
+            event.target.reset();
+        }
+
+        function likeGoal(button) {
+            const span = button.querySelector('span');
+            let likes = parseInt(span.textContent);
+            likes++;
+            span.textContent = likes;
+            
+            // Add heart animation
+            const heart = document.createElement('span');
+            heart.innerHTML = '❤️';
+            heart.style.position = 'absolute';
+            heart.style.left = `${Math.random() * 100}%`;
+            heart.style.top = '50%';
+            heart.style.animation = 'flyHeart 1s ease-out forwards';
+            button.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 1000);
+        }
+
+        function addComment(button) {
+            const card = button.closest('.goal-card');
+            const commentsSection = card.querySelector('.comments-section');
+            const isVisible = commentsSection.style.display !== 'none';
+            
+            if (isVisible) {
+                commentsSection.style.display = 'none';
+            } else {
+                commentsSection.style.display = 'block';
+                const input = commentsSection.querySelector('.comment-input');
+                input.focus();
+                
+                // Add comment on enter
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && this.value.trim() !== '') {
+                        const comment = document.createElement('div');
+                        comment.className = 'comment';
+                        comment.textContent = this.value;
+                        commentsSection.appendChild(comment);
+                        this.value = '';
+                    }
+                });
+            }
+        }
+
+        // Add a style for the heart animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes flyHeart {
+                0% {
+                    transform: translate(-50%, -50%) scale(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(-50%, -200%) scale(1.5);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
